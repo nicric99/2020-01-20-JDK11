@@ -5,7 +5,7 @@ public class Artist {
 	private String nome;
 	@Override
 	public String toString() {
-		return  nome;
+		return  id+"  "+nome;
 	}
 	public Artist(Integer id, String nome) {
 		super();

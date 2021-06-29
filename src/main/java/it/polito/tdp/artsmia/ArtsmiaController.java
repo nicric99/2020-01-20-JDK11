@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.artsmia.model.Artist;
 import it.polito.tdp.artsmia.model.ArtistiConnessi;
 import it.polito.tdp.artsmia.model.Model;
 import javafx.event.ActionEvent;
@@ -54,8 +55,29 @@ public class ArtsmiaController {
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
     	txtResult.clear();
-    	txtResult.appendText("Calcola percorso");
-    	txtRe
+    	txtResult.appendText("Calcola percorso\n");
+    	String id= txtArtista.getText();
+    	Integer num=null;
+    	try {
+    		num=Integer.parseInt(id);
+    	}catch(NumberFormatException nfe) {
+    		txtResult.appendText("Attenzione devi selezionare un id numerico\n");
+    		return;
+    	}
+    	Artist trovato=model.trovato(num);
+    	if(trovato==null) {
+    		txtResult.appendText("L'id non corrisponde ad alcun artista nel grafo\n");
+    		return;
+    	}
+    	if(model.ricorsione(trovato).size()==1) {
+    		txtResult.appendText("Non è stato possibile trovare alcun cammino");
+    		return;
+    	}
+    	for(Artist a:model.ricorsione(trovato)) {
+    		txtResult.appendText(a.getId()+" "+a.getNome()+" \n");
+    	}
+    	txtResult.appendText("Il peso del percorso migliore"+model.getPesoMigliore()+" Lunghezza "+model.getMigliore().size());
+    	
     	
     }
 

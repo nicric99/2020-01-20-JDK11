@@ -19,6 +19,7 @@ public class Model {
 	private ArtsmiaDAO dao;
 	private Map<Integer, Artist> idMap ;
 	private Graph<Artist, DefaultWeightedEdge> grafo ;
+	private List<Artist> migliore;
 	
 	
 	// crezione di un grafo e costruttore del model
@@ -60,6 +61,68 @@ public class Model {
 		Collections.reverse(result);
 		return result;
 	}
-	
+	public Artist trovato(Integer num) {
+		for(Artist a:this.grafo.vertexSet()) {
+			if(a.getId().equals(num)) {
+				return a;
+			}
+		}
+		return null;
+	}
+	public List<Artist> ricorsione(Artist partenza) {
+		migliore=null;
+		List<Artist> parziale= new ArrayList<>();
+		parziale.add(partenza);
+		cerca(parziale,0,0);
+		return this.migliore;		
+	}
+	private void cerca(List<Artist> parziale,Integer livello, Integer peso) {
+		//condizione di terminazione
+		if(migliore==null) {
+			migliore= new ArrayList<>(parziale);
+		}else {
+			if(accettabile(parziale,peso)==false) {
+				if(parziale.size()>migliore.size()) {
+					this.migliore= new ArrayList<>(parziale);	
+				}
+				return;
+			}
+		}
+		for(Artist a:Graphs.neighborListOf(this.grafo, parziale.get(parziale.size()-1))) {
+			if(livello==0) {
+				DefaultWeightedEdge e= this.grafo.getEdge(parziale.get(parziale.size()-1), a);
+				int valore= (int) this.grafo.getEdgeWeight(e);
+				parziale.add(a);
+				cerca(parziale,livello+1,valore);
+				parziale.remove(a);
+			}else {
+				DefaultWeightedEdge e= this.grafo.getEdge(parziale.get(parziale.size()-1), a);
+				int valore= (int) this.grafo.getEdgeWeight(e);
+				if(valore==peso && !parziale.contains(a)) {
+					parziale.add(a);
+					cerca(parziale,livello+1,valore);
+					parziale.remove(a);				
+				}
+			}
+		}
+		
+	}
+	private boolean accettabile(List<Artist> parziale,Integer peso) {
+		for(Artist a: Graphs.neighborListOf(this.grafo,parziale.get(parziale.size()-1) )) {
+			DefaultWeightedEdge e= this.grafo.getEdge(parziale.get(parziale.size()-1), a);
+			int valore= (int) this.grafo.getEdgeWeight(e);
+			if(peso==valore && !parziale.contains(a)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public Integer getPesoMigliore() {
+		DefaultWeightedEdge e= this.grafo.getEdge(migliore.get(migliore.size()-1),migliore.get(migliore.size()-2));
+		return (int) this.grafo.getEdgeWeight(e);
+	}
+	public List<Artist> getMigliore(){
+		return this.migliore;
+	}
 	
 }
